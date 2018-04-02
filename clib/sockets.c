@@ -39,10 +39,11 @@ Functions:
 #include <unistd.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <sys/un.h>
-#include <netdb.h>
+//#include <sys/socket.h>
+//#include <netinet/in.h>
+//#include <sys/un.h>
+//#include <netdb.h>
+#include <ws2tcpip.h>
 
 void open_socket(int *psockfd, int* inet, int* port, const char* host)
 /* Opens a socket.
@@ -87,7 +88,7 @@ Args:
       if (connect(sockfd, res->ai_addr, res->ai_addrlen) < 0) 
       { perror("Error opening INET socket: wrong port or server unreachable"); exit(-1); }
       freeaddrinfo(res);
-   }
+   }/*
    else
    {  
       struct sockaddr_un serv_addr;
@@ -105,7 +106,7 @@ Args:
       // connects
       if (connect(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) 
       { perror("Error opening UNIX socket: path unavailable, or already existing"); exit(-1); }
-   }
+   }*/
 
 
    *psockfd=sockfd;
