@@ -10,7 +10,9 @@ SUBROUTINE tg_gather( dffts, v, tg_v )
   TYPE(fft_type_descriptor), INTENT(in) :: dffts
   REAL(DP), INTENT(IN)  :: v(dffts%nnr)
   REAL(DP), INTENT(OUT) :: tg_v(dffts%nnr_tg)
-
+#if defined(__MPI)
+  REAL(DP) :: tg_v_sendbuf(dffts%nnr_tg)
+#endif
   INTEGER :: nxyp, ir3, off, tg_off
   INTEGER :: i, nsiz, ierr
 
@@ -31,7 +33,8 @@ SUBROUTINE tg_gather( dffts, v, tg_v )
 #if defined(__MPI)
 !used to be   CALL mp_sum(tg_v, dffts%comm2 )
   nsiz =dffts%nnr_tg
-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
+  tg_v_sendbuf = tg_v
+  CALL MPI_ALLREDUCE( tg_v_sendbuf, tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
   IF( ierr /= 0 ) CALL fftx_error__( ' tg_gather ', ' MPI_ALLREDUCE ', abs( ierr ) )
 !- could be done (more efficintly?) with an ALLgatherv but the loigc of the ALLREDUCE is simpler
 !  CALL MPI_Allgatherv( v(1), nsiz, MPI_DOUBLE_PRECISION, &
@@ -53,6 +56,9 @@ SUBROUTINE tg_cgather( dffts, v, tg_v )
   TYPE(fft_type_descriptor), INTENT(in) :: dffts
   COMPLEX(DP), INTENT(IN)  :: v(dffts%nnr)
   COMPLEX(DP), INTENT(OUT) :: tg_v(dffts%nnr_tg)
+#if defined(__MPI)
+  COMPLEX(DP) :: tg_v_sendbuf(dffts%nnr_tg)
+#endif
 
   INTEGER :: nxyp, ir3, off, tg_off
   INTEGER :: i, nsiz, ierr
@@ -74,7 +80,8 @@ SUBROUTINE tg_cgather( dffts, v, tg_v )
 #if defined(__MPI)
 !used to be   CALL mp_sum(tg_v, dffts%comm2 )
   nsiz =2 * dffts%nnr_tg
-  CALL MPI_ALLREDUCE( MPI_IN_PLACE, tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
+  tg_v_sendbuf = tg_v
+  CALL MPI_ALLREDUCE( tg_v_sendbuf, tg_v, nsiz, MPI_DOUBLE_PRECISION, MPI_SUM, dffts%comm2, ierr )
   IF( ierr /= 0 ) CALL fftx_error__( ' tg_gather ', ' MPI_ALLREDUCE ', abs( ierr ) )
 !- could be done (more efficintly?) with an ALLgatherv but the loigc of the ALLREDUCE is simpler
 !  CALL MPI_Allgatherv( v(1), nsiz, MPI_DOUBLE_PRECISION, &

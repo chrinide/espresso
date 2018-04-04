@@ -104,6 +104,7 @@ CONTAINS
       REAL(DP), external ::ddot
 !
       REAL(DP) :: g, scalef, sigma, kappa, f, h, tmp
+      REAL(DP) :: scalef_sendbuf
       REAL(DP), ALLOCATABLE :: u(:)
       REAL(DP), ALLOCATABLE :: p(:)
       REAL(DP), ALLOCATABLE :: vtmp(:)
@@ -148,7 +149,8 @@ CONTAINS
            END DO
 
 #if defined __MPI
-           CALL MPI_ALLREDUCE( MPI_IN_PLACE, scalef, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+           scalef_sendbuf = scalef
+           CALL MPI_ALLREDUCE( scalef_sendbuf, scalef, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
            IF( ierr /= 0 ) CALL lax_error__( ' ptredv ', 'error in mpi_allreduce 1', ierr )
 #endif
 

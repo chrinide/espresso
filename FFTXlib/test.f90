@@ -794,6 +794,7 @@ end subroutine
    INTEGER :: mype, npe, comm
    LOGICAL :: global_sort
    INTEGER, ALLOCATABLE :: ngmpe(:)
+   INTEGER, ALLOCATABLE :: ngmpe_sendbuf(:)
    !
    global_sort = .NOT. no_global_sort
    !
@@ -803,6 +804,7 @@ end subroutine
    !
    IF( .NOT. global_sort ) THEN
       ALLOCATE( ngmpe( npe ) )
+      ALLOCATE(ngmpe_sendbuf(npe))
       ngmpe = 0
       ngm_max = ngm
       ngms_max = ngms
@@ -886,7 +888,8 @@ end subroutine
 
    IF( .NOT. global_sort ) THEN
       ngmpe( mype + 1 ) = ngm
-      CALL MPI_ALLREDUCE( MPI_IN_PLACE, ngmpe, 1, MPI_INTEGER, MPI_SUM, comm, ierr )
+      ngmpe_sendbuf = ngmpe
+      CALL MPI_ALLREDUCE( ngmpe_sendbuf, ngmpe, 1, MPI_INTEGER, MPI_SUM, comm, ierr )
    END IF
    IF (ngm  /= ngm_max) &
          CALL fftx_error__ ('ggen', 'g-vectors missing !', abs(ngm - ngm_max))
@@ -1005,6 +1008,7 @@ end subroutine
    IF ( gamma_only) CALL index_minusg( ngm, ngms, nlm, nlsm, mill, dfftp, dffts )
 
    IF( ALLOCATED( ngmpe ) ) DEALLOCATE( ngmpe )
+   DEALLOCATE(ngmpe_sendbuf)
 
    END SUBROUTINE ggen
 

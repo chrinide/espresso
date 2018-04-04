@@ -54,6 +54,7 @@ CONTAINS
 !     .. Array Arguments ..
       REAL(DP)             D( * ), E( * )
       COMPLEX(DP)         AP(LDA, * ), TAU( * )
+      COMPLEX(DP)         TAU_sendbuf
 !     ..
 !
 !  Purpose
@@ -155,8 +156,10 @@ CONTAINS
       INTEGER            J, I, I1, K, I2, NI1, JL
       INTEGER            KL, J1
       COMPLEX(DP)         ALPHA, TAUI
+      COMPLEX(DP)         ALPHA_sendbuf
       INTEGER            KNT, IERR
       REAL(DP)             ALPHI, ALPHR, BETA, RSAFMN, SAFMIN, XNORM
+      REAL(DP)             XNORM_sendbuf
 !     ..
 !     .. External Subroutines ..
       EXTERNAL           zaxpy
@@ -228,7 +231,8 @@ CONTAINS
                 END IF
 #if defined __MPI
                 XNORM = XNORM ** 2 
-                CALL MPI_ALLREDUCE( MPI_IN_PLACE, xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+                XNORM_sendbuf = XNORM
+                CALL MPI_ALLREDUCE( XNORM_sendbuf, xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
                 IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 1', ierr )
                 XNORM = SQRT( xnorm )
 #endif
@@ -262,7 +266,8 @@ CONTAINS
                     XNORM = DZNRM2( NI1, AP( I2, I ), 1 )
 #if defined __MPI
                     XNORM = XNORM ** 2 
-                    CALL MPI_ALLREDUCE( MPI_IN_PLACE, xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+                    XNORM_sendbuf = XNORM
+                    CALL MPI_ALLREDUCE( XNORM_sendbuf, xnorm, 1, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
                     IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 2', ierr )
                     XNORM = SQRT( XNORM )
 #endif
@@ -359,7 +364,8 @@ CONTAINS
 
 #if defined __MPI
                ! ... parallel sum TAU
-               CALL MPI_ALLREDUCE( MPI_IN_PLACE, tau( i ), 2*(n - i + 1), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+               TAU_sendbuf = TAU(i)
+               CALL MPI_ALLREDUCE( TAU_sendbuf, tau( i ), 2*(n - i + 1), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
                IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 3', ierr )
 #endif
 !
@@ -387,7 +393,8 @@ CONTAINS
                END IF
 
 #if defined __MPI
-               CALL MPI_ALLREDUCE( MPI_IN_PLACE, alpha, 2, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+               ALPHA_sendbuf = ALPHA
+               CALL MPI_ALLREDUCE( ALPHA_sendbuf, alpha, 2, MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
                IF( ierr /= 0 ) CALL lax_error__( ' pzhptrd ', 'error in mpi_allreduce 4', ierr )
 #endif
 
@@ -578,6 +585,9 @@ CONTAINS
       INTEGER OW(N+1)
       COMPLEX(DP) CTMP
       COMPLEX(DP) WORK(N+1)
+#if defined __MPI
+      COMPLEX(DP) WORK_sendbuf(N+1)
+#endif
 
 !     ..
 !     .. Local __SCALARs ..
@@ -686,7 +696,8 @@ CONTAINS
               END IF
 
 #if defined __MPI
-              CALL MPI_ALLREDUCE( MPI_IN_PLACE, work, 2*(n - 1 - i), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
+              WORK_sendbuf = WORK
+              CALL MPI_ALLREDUCE( WORK_sendbuf, work, 2*(n - 1 - i), MPI_DOUBLE_PRECISION, MPI_SUM, comm, ierr )
               IF( ierr /= 0 ) CALL lax_error__( ' pzupgtr ', 'error in mpi_allreduce 1', ierr )
 #endif
               !

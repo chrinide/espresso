@@ -197,6 +197,10 @@ CONTAINS
       INTEGER :: i1, i2, i3, n1, n2, n3, mype, nproc, ierr
       REAL(DP) :: amod
       INTEGER :: ngm
+#if defined(__MPI)
+      INTEGER :: st_sendbuf( lb(1) : ub(1), lb(2) : ub(2) )
+      INTEGER :: ngm_sendbuf
+#endif
       !write (6,*) 'inside sticks_map_set gcut=',gcut; FLUSH(6)
       !write (6,*) ub,lb
 
@@ -250,8 +254,10 @@ CONTAINS
 
 #if defined(__MPI)
       IF( PRESENT( comm ) ) THEN
-         CALL MPI_ALLREDUCE(MPI_IN_PLACE, st, size(st), MPI_INTEGER, MPI_SUM, comm, ierr)
-         CALL MPI_ALLREDUCE(MPI_IN_PLACE, ngm, 1, MPI_INTEGER, MPI_SUM, comm, ierr)
+         st_sendbuf = st
+         CALL MPI_ALLREDUCE(st_sendbuf, st, size(st), MPI_INTEGER, MPI_SUM, comm, ierr)
+         ngm_sendbuf = ngm
+         CALL MPI_ALLREDUCE(ngm_sendbuf, ngm, 1, MPI_INTEGER, MPI_SUM, comm, ierr)
       END IF
 #endif
 

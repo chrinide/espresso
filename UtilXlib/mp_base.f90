@@ -205,6 +205,7 @@ SUBROUTINE reduce_base_real( dim, ps, comm, root )
   !
   INTEGER,  INTENT(IN)    :: dim     ! size of the array
   REAL(DP)                :: ps(dim) ! array whose elements have to be reduced
+  REAL(DP)                :: ps_sendbuf(dim)
   INTEGER,  INTENT(IN)    :: comm    ! communicator
   INTEGER,  INTENT(IN)    :: root    ! if root <  0 perform a reduction to all procs
                                      ! if root >= 0 perform a reduce only to root proc.
@@ -225,11 +226,12 @@ SUBROUTINE reduce_base_real( dim, ps, comm, root )
   CALL mp_synchronize( comm )
 #endif
   !
+  ps_sendbuf = ps
   IF( root >= 0 ) THEN
-     CALL MPI_REDUCE( MPI_IN_PLACE, ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, root, comm, info )
+     CALL MPI_REDUCE( ps_sendbuf, ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, root, comm, info )
      IF( info /= 0 ) CALL errore( 'reduce_base_real', 'error in mpi_reduce 1', info )
   ELSE
-     CALL MPI_ALLREDUCE( MPI_IN_PLACE, ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, comm, info )
+     CALL MPI_ALLREDUCE( ps_sendbuf, ps, dim, MPI_DOUBLE_PRECISION, MPI_SUM, comm, info )
      IF( info /= 0 ) CALL errore( 'reduce_base_real', 'error in mpi_allreduce 1', info )
   END IF
   !
@@ -363,6 +365,7 @@ SUBROUTINE reduce_base_integer( dim, ps, comm, root )
   !
   INTEGER,  INTENT(IN)    :: dim
   INTEGER                 :: ps(dim)
+  INTEGER                 :: ps_sendbuf(dim)
   INTEGER,  INTENT(IN)    :: comm    ! communicator
   INTEGER,  INTENT(IN)    :: root    ! if root <  0 perform a reduction to all procs
                                      ! if root >= 0 perform a reduce only to root proc.
@@ -381,11 +384,12 @@ SUBROUTINE reduce_base_integer( dim, ps, comm, root )
   CALL mp_synchronize( comm )
 #endif
   !
+  ps_sendbuf = ps
   IF( root >= 0 ) THEN
-     CALL MPI_REDUCE( MPI_IN_PLACE, ps, dim, MPI_INTEGER, MPI_SUM, root, comm, info )
+     CALL MPI_REDUCE( ps_sendbuf, ps, dim, MPI_INTEGER, MPI_SUM, root, comm, info )
      IF( info /= 0 ) CALL errore( 'reduce_base_integer', 'error in mpi_reduce 1', info )
   ELSE
-     CALL MPI_ALLREDUCE( MPI_IN_PLACE, ps, dim, MPI_INTEGER, MPI_SUM, comm, info )
+     CALL MPI_ALLREDUCE( ps_sendbuf, ps, dim, MPI_INTEGER, MPI_SUM, comm, info )
      IF( info /= 0 ) CALL errore( 'reduce_base_integer', 'error in mpi_allreduce 1', info )
   END IF
   !
