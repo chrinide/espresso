@@ -1,10 +1,7 @@
 *~
 *.o
 *.mod
-*.x
 *.a
-bin/*
-*.inc
 iotk
 S3DE
 include/fft_defs.h
