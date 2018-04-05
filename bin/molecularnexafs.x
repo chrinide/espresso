@@ -1,0 +1,1 @@
+../XSpectra/src/molecularnexafs.x
