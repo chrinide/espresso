@@ -41,13 +41,15 @@ SUBROUTINE lr_setup_nscf ()
   USE uspp_param,         ONLY : n_atom_wfc
   USE lr_symm_base,       ONLY : nsymq, minus_q
   USE qpoint,             ONLY : xq
-  ! 
+  !
   IMPLICIT NONE
   !
-  LOGICAL :: magnetic_sym 
+  LOGICAL :: magnetic_sym
+  !
+  LOGICAL, EXTERNAL :: check_para_diag
   !
   CALL start_clock( 'lr_setup_nscf' )
-  ! 
+  !
   IF ( .NOT. ALLOCATED( force ) ) ALLOCATE( force( 3, nat ) )
   !
   ! ... threshold for diagonalization ethr - should be good for all cases
@@ -63,7 +65,7 @@ SUBROUTINE lr_setup_nscf ()
   natomwfc = n_atom_wfc( nat, ityp, noncolin )
   !
 #if defined(__MPI)
-  IF ( use_para_diag )  CALL check_para_diag( nbnd )
+  use_para_diag = check_para_diag( nbnd )
 #else
   use_para_diag = .FALSE.
 #endif
@@ -80,7 +82,7 @@ SUBROUTINE lr_setup_nscf ()
   !
   CALL lr_smallgq (xq)
   !
-  !  K points section   
+  !  K points section
   !
   ! Input k-points are assumed to be given in the IBZ of the Bravais
   ! lattice, with the full point symmetry of the lattice.
