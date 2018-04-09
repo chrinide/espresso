@@ -30,7 +30,7 @@
 TOPDIR = $(dir $(abspath $(filter %make.inc,$(MAKEFILE_LIST))))
 # if it doesn't work, uncomment the following line (edit if needed):
 
-# TOPDIR = /home/nakayama/qe
+# TOPDIR = /c/Users/nishihara.satomichi/git/espresso
 
 # DFLAGS  = precompilation options (possible arguments to -D and -U)
 #           used by the C compiler and preprocessor
@@ -42,7 +42,7 @@ TOPDIR = $(dir $(abspath $(filter %make.inc,$(MAKEFILE_LIST))))
 # MANUAL_DFLAGS  = additional precompilation option(s), if desired
 #                  BEWARE: it does not work for IBM xlf! Manually edit FDFLAGS
 MANUAL_DFLAGS  =
-DFLAGS         = -D_WIN32 -D__MPI -D__DFTI
+DFLAGS         = -D_WIN32 -D__OPENMP -D__MPI -D__DFTI
 FDFLAGS        = $(DFLAGS) $(MANUAL_DFLAGS)
 
 # IFLAGS = how to locate directories with *.h or *.f90 file to be included
@@ -50,7 +50,7 @@ FDFLAGS        = $(DFLAGS) $(MANUAL_DFLAGS)
 #          the latter contains .e.g. files needed by FFT libraries
 # for libxc add -I/path/to/libxc/include/
 
-IFLAGS         = -I$(TOPDIR)/include -I$(TOPDIR)/FoX/finclude -I../include/ -I/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2016.3.207/windows/mkl/include -I/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2017.0.109/windows/mkl/include -I/home/nakayama/msmpi/Include
+IFLAGS         = -I$(TOPDIR)/include -I$(TOPDIR)/FoX/finclude -I../include/ -I"C:\mingw64\mingw64\include" -I"C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\include"
 
 # MOD_FLAGS = flag used by f90 compiler to locate modules
 # Each Makefile defines the list of needed modules in MODFLAGS
@@ -67,8 +67,8 @@ MOD_FLAG      = -I
 # and to specify the location of MPI libraries in MPI_LIBS
 
 MPIF90         = gfortran
-F90           = gfortran
-CC             = cc
+#F90           = gfortran
+CC             = gcc
 F77            = gfortran
 
 # C preprocessor and preprocessing flags - for explicit preprocessing,
@@ -84,7 +84,7 @@ CPPFLAGS       = -P -traditional $(DFLAGS) $(IFLAGS)
 
 CFLAGS         = -O3 $(DFLAGS) $(IFLAGS)
 F90FLAGS       = $(FFLAGS) -x f95-cpp-input -fopenmp $(FDFLAGS) $(IFLAGS) $(MODFLAGS)
-FFLAGS         = -fno-range-check
+FFLAGS         = -O3 -g -fopenmp -fno-range-check -fno-trapping-math -ffpe-summary=no
 
 # compiler flags without optimization for fortran-77
 # the latter is NEEDED to properly compile dlamch.f, used by lapack
@@ -101,7 +101,7 @@ FFLAGS_NOMAIN   =
 # for libxc, set LD_LIBS=-L/path/to/libxc/lib/ -lxcf90 -lxc
 
 LD             = gfortran
-LDFLAGS        = -g -pthread -fopenmp
+LDFLAGS        = -g -pthread -fopenmp -fno-range-check -fno-trapping-math -ffpe-summary=no
 LD_LIBS        = -lws2_32
 
 # External Libraries (if any) : blas, lapack, fft, MPI
@@ -110,7 +110,7 @@ LD_LIBS        = -lws2_32
 # BLAS_LIBS = /your/path/to/espresso/LAPACK/blas.a
 # BLAS_LIBS_SWITCH = internal
 
-BLAS_LIBS      = -L/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2016.3.207/windows/mkl/lib/intel64 -L/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2017.0.109/windows/mkl/lib/intel64 -lmkl_rt
+BLAS_LIBS      = -L"C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64" -lmkl_rt
 BLAS_LIBS_SWITCH = external
 
 # If you have nothing better, use the local copy via "--with-netlib" :
@@ -119,7 +119,7 @@ BLAS_LIBS_SWITCH = external
 # For IBM machines with essl (-D__ESSL): load essl BEFORE lapack !
 # remember that LAPACK_LIBS precedes BLAS_LIBS in loading order
 
-LAPACK_LIBS    = -L/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2016.3.207/windows/mkl/lib/intel64 -L/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2017.0.109/windows/mkl/lib/intel64 -lmkl_rt
+LAPACK_LIBS    = -L"C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64" -lmkl_rt
 LAPACK_LIBS_SWITCH = external
 
 SCALAPACK_LIBS = 
@@ -127,7 +127,7 @@ SCALAPACK_LIBS =
 # nothing needed here if the the internal copy of FFTW is compiled
 # (needs -D__FFTW in DFLAGS)
 
-FFT_LIBS       = -L/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2016.3.207/windows/mkl/lib/intel64 -L/c/ProgramFilesx86/IntelSWTools/compilers_and_libraries_2017.0.109/windows/mkl/lib/intel64 -lmkl_rt
+FFT_LIBS       = -L"C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\mkl\lib\intel64" -lmkl_rt
 
 # HDF5
 HDF5_LIB = 
@@ -137,7 +137,7 @@ FOX_LIB  = -L$(TOPDIR)/FoX/lib  -lFoX_dom -lFoX_sax -lFoX_wxml -lFoX_common\
 # For parallel execution, the correct path to MPI libraries must
 # be specified in MPI_LIBS (except for IBM if you use mpxlf)
 
-MPI_LIBS       = -L/home/nakayama/msmpi/Lib -lmsmpi
+MPI_LIBS       = -lmsmpi
 
 # IBM-specific: MASS libraries, if available and if -D__MASS is defined in FDFLAGS
 
@@ -145,7 +145,7 @@ MASS_LIBS      =
 
 # ar command and flags - for most architectures: AR = ar, ARFLAGS = ruv
 
-AR             = /usr/bin/ar
+AR             = ar
 ARFLAGS        = ruv
 
 # ranlib command. If ranlib is not needed (it isn't in most cases) use
@@ -164,4 +164,4 @@ LIBS           = $(SCALAPACK_LIBS) $(LAPACK_LIBS) $(FOX_LIB) $(FFT_LIBS) $(BLAS_
 WGET = wget -O
 
 # Install directory - not currently used
-PREFIX = /mingw64
+PREFIX = /usr/local
