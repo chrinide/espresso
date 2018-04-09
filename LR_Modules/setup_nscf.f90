@@ -52,11 +52,13 @@ SUBROUTINE setup_nscf ( newgrid, xq, elph_mat )
   !
   REAL (DP), INTENT(IN) :: xq(3)
   LOGICAL, INTENT (IN) :: newgrid
-  LOGICAL, INTENT (IN) :: elph_mat  ! used to be passed through a module. 
+  LOGICAL, INTENT (IN) :: elph_mat  ! used to be passed through a module.
   !
   REAL (DP), ALLOCATABLE :: rtau (:,:,:)
   LOGICAL  :: magnetic_sym, sym(48)
   LOGICAL  :: skip_equivalence
+  !
+  LOGICAL, EXTERNAL :: check_para_diag
   !
   IF ( .NOT. ALLOCATED( force ) ) ALLOCATE( force( 3, nat ) )
   !
@@ -73,7 +75,7 @@ SUBROUTINE setup_nscf ( newgrid, xq, elph_mat )
   natomwfc = n_atom_wfc( nat, ityp, noncolin )
   !
 #if defined(__MPI)
-  IF ( use_para_diag )  CALL check_para_diag( nbnd )
+  use_para_diag = check_para_diag( nbnd )
 #else
   use_para_diag = .FALSE.
 #endif
@@ -104,7 +106,7 @@ SUBROUTINE setup_nscf ( newgrid, xq, elph_mat )
      !
      ! In this case I generate a new set of k-points
      !
-     ! In the case of electron-phonon matrix element with wannier functions 
+     ! In the case of electron-phonon matrix element with wannier functions
      ! (and possibly in other cases as well) the k-points should not be reduced
      !
      skip_equivalence = elph_mat
