@@ -30,7 +30,7 @@
 TOPDIR = $(dir $(abspath $(filter %make.inc,$(MAKEFILE_LIST))))
 # if it doesn't work, uncomment the following line (edit if needed):
 
-# TOPDIR = /data2/group4/nakayama/q-e_old-qe-6.2.1
+# TOPDIR = /data2/group3/nisihara/espresso_serial
 
 # DFLAGS  = precompilation options (possible arguments to -D and -U)
 #           used by the C compiler and preprocessor
@@ -42,7 +42,7 @@ TOPDIR = $(dir $(abspath $(filter %make.inc,$(MAKEFILE_LIST))))
 # MANUAL_DFLAGS  = additional precompilation option(s), if desired
 #                  BEWARE: it does not work for IBM xlf! Manually edit FDFLAGS
 MANUAL_DFLAGS  =
-DFLAGS         =  -D__DFTI -D__MPI -D__SCALAPACK
+DFLAGS         =  -D__DFTI -D__OPENMP
 FDFLAGS        = $(DFLAGS) $(MANUAL_DFLAGS)
 
 # IFLAGS = how to locate directories with *.h or *.f90 file to be included
@@ -66,10 +66,10 @@ MOD_FLAG      = -I
 # try to specify the directory containing "mpif.h" in IFLAGS
 # and to specify the location of MPI libraries in MPI_LIBS
 
-MPIF90         = mpiifort
+MPIF90         = ifort
 F90           = ifort
-CC             = mpiicc
-F77            = mpiifort
+CC             = icc
+F77            = ifort
 
 # C preprocessor and preprocessing flags - for explicit preprocessing,
 # if needed (see the compilation rules above)
@@ -100,7 +100,7 @@ FFLAGS_NOMAIN   = -nofor_main
 # Typically LD coincides with F90 or MPIF90, LD_LIBS is empty
 # for libxc, set LD_LIBS=-L/path/to/libxc/lib/ -lxcf90 -lxc
 
-LD             = mpiifort
+LD             = ifort
 LDFLAGS        = -static-intel  -qopenmp
 LD_LIBS        = 
 
@@ -110,7 +110,11 @@ LD_LIBS        =
 # BLAS_LIBS = /your/path/to/espresso/LAPACK/blas.a
 # BLAS_LIBS_SWITCH = internal
 
-BLAS_LIBS      =   -lmkl_intel_lp64  -lmkl_intel_thread -lmkl_core
+BLAS_LIBS      =   -Wl,--start-group \
+                   /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.a \
+                   /opt/intel/mkl/lib/intel64/libmkl_intel_thread.a \
+                   /opt/intel/mkl/lib/intel64/libmkl_core.a \
+                   -Wl,--end-group
 BLAS_LIBS_SWITCH = external
 
 # If you have nothing better, use the local copy via "--with-netlib" :
@@ -122,7 +126,7 @@ BLAS_LIBS_SWITCH = external
 LAPACK_LIBS    = 
 LAPACK_LIBS_SWITCH = external
 
-SCALAPACK_LIBS = -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64
+SCALAPACK_LIBS = 
 
 # nothing needed here if the the internal copy of FFTW is compiled
 # (needs -D__FFTW in DFLAGS)
@@ -164,4 +168,4 @@ LIBS           = $(SCALAPACK_LIBS) $(LAPACK_LIBS) $(FOX_LIB) $(FFT_LIBS) $(BLAS_
 WGET = wget -O
 
 # Install directory - not currently used
-PREFIX = /usr/local
+PREFIX = /data2/group3/nisihara/espresso_serial
