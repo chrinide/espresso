@@ -25,11 +25,11 @@ LAPACK_NETLIB_URL=http://www.netlib.org/lapack/${LAPACK_NETLIB}
 #
 # MAIN target
 #
-all: 
-	$(MAKE) libblas_$(BLAS_LIBS_SWITCH) 
-	$(MAKE) liblapack_$(LAPACK_LIBS_SWITCH) 
-	$(MAKE) libelpa_internal 
-	$(MAKE) libiotk 
+all:
+	$(MAKE) libblas_$(BLAS_LIBS_SWITCH)
+	$(MAKE) liblapack_$(LAPACK_LIBS_SWITCH)
+	$(MAKE) libelpa_internal
+	$(MAKE) libiotk
 
 libblas : libblas_$(BLAS_LIBS_SWITCH)
 
@@ -47,7 +47,7 @@ fake_blas_external :
 #        (echo "no configuration file found for blas"; \
 #	echo "run configure from main QE dir"; exit); fi
 
-liblapack : liblapack_$(LAPACK_LIBS_SWITCH) 
+liblapack : liblapack_$(LAPACK_LIBS_SWITCH)
 
 liblapack_external : fake_lapack_external
 
@@ -61,7 +61,7 @@ liblapack_internal:
 	  (cp make_lapack.inc ../LAPACK/make.inc; \
 	  cd ../LAPACK; $(MAKE) blaslib lapacklib); else \
         (echo "no configuration file found for lapack"; \
-         echo "run configure from main QE dir"; exit); fi 
+         echo "run configure from main QE dir"; exit); fi
 
 libiotk:
 	if test ! -d ../S3DE; then \
@@ -70,11 +70,11 @@ libiotk:
         (cp Makefile_iotk ../S3DE/iotk/src/Makefile); fi; \
 	if test -e iotk_config.h; then \
 	(cp iotk_config.h ../S3DE/iotk/include/iotk_config.h); fi; fi
-	cd ../S3DE/iotk/src; $(MAKE) lib+util; 
+	cd ../S3DE/iotk/src; $(MAKE) lib+util;
 	cd ../bin; ln -fs ../S3DE/iotk/tools/iotk .; \
 	ln -fs ../S3DE/iotk/src/iotk.x .; \
 	ln -fs ../S3DE/iotk/src/iotk_print_kinds.x .; \
-	cd ../; rm -rf iotk; ln -fs S3DE/iotk iotk
+	cd ../; ln -fs S3DE/iotk iotk
 
 libfox:
 	if test ! -d ../FoX; then \
