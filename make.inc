@@ -30,7 +30,7 @@
 TOPDIR = $(dir $(abspath $(filter %make.inc,$(MAKEFILE_LIST))))
 # if it doesn't work, uncomment the following line (edit if needed):
 
-# TOPDIR = /data2/group4/nakayama/q-e_old-qe-6.2.1
+# TOPDIR = /home/s-nishihara/espresso
 
 # DFLAGS  = precompilation options (possible arguments to -D and -U)
 #           used by the C compiler and preprocessor
@@ -42,7 +42,7 @@ TOPDIR = $(dir $(abspath $(filter %make.inc,$(MAKEFILE_LIST))))
 # MANUAL_DFLAGS  = additional precompilation option(s), if desired
 #                  BEWARE: it does not work for IBM xlf! Manually edit FDFLAGS
 MANUAL_DFLAGS  =
-DFLAGS         =  -D__DFTI -D__MPI -D__SCALAPACK
+DFLAGS         =  -D__DFTI -D__MPI -D__OPENMP -D__SCALAPACK
 FDFLAGS        = $(DFLAGS) $(MANUAL_DFLAGS)
 
 # IFLAGS = how to locate directories with *.h or *.f90 file to be included
@@ -110,7 +110,11 @@ LD_LIBS        =
 # BLAS_LIBS = /your/path/to/espresso/LAPACK/blas.a
 # BLAS_LIBS_SWITCH = internal
 
-BLAS_LIBS      =   -lmkl_intel_lp64  -lmkl_intel_thread -lmkl_core
+BLAS_LIBS      =   -Wl,--start-group \
+                   /opt/intel/mkl/lib/intel64/libmkl_intel_lp64.a \
+                   /opt/intel/mkl/lib/intel64/libmkl_intel_thread.a \
+                   /opt/intel/mkl/lib/intel64/libmkl_core.a \
+                   -Wl,--end-group
 BLAS_LIBS_SWITCH = external
 
 # If you have nothing better, use the local copy via "--with-netlib" :
@@ -122,7 +126,10 @@ BLAS_LIBS_SWITCH = external
 LAPACK_LIBS    = 
 LAPACK_LIBS_SWITCH = external
 
-SCALAPACK_LIBS = -lmkl_scalapack_lp64 -lmkl_blacs_intelmpi_lp64
+SCALAPACK_LIBS = -Wl,--start-group \
+                 /opt/intel/mkl/lib/intel64/libmkl_blacs_intelmpi_lp64.a \
+                 /opt/intel/mkl/lib/intel64/libmkl_scalapack_lp64.a \
+                 -Wl,--end-group
 
 # nothing needed here if the the internal copy of FFTW is compiled
 # (needs -D__FFTW in DFLAGS)
@@ -164,4 +171,4 @@ LIBS           = $(SCALAPACK_LIBS) $(LAPACK_LIBS) $(FOX_LIB) $(FFT_LIBS) $(BLAS_
 WGET = wget -O
 
 # Install directory - not currently used
-PREFIX = /usr/local
+PREFIX = /data2/group3/nisihara/espresso_parallel
