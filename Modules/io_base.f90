@@ -140,7 +140,7 @@ MODULE io_base
          ALLOCATE( rtmp( 2, MAX( npol*igwx, 1 ) ) )
       ELSE
          ALLOCATE( wtmp( 1 ) )
-         ALLOCATE( wtmp( 2, 1 ) )
+         ALLOCATE( rtmp( 2, 1 ) )
       ENDIF
       wtmp = 0.0_DP
       !
