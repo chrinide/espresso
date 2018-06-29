@@ -101,8 +101,8 @@ FFLAGS_NOMAIN   = -nofor_main
 # for libxc, set LD_LIBS=-L/path/to/libxc/lib/ -lxcf90 -lxc
 
 LD             = ifort
-LDFLAGS        = -static-intel  -qopenmp
-LD_LIBS        = 
+LDFLAGS        = -static-intel -qopenmp
+LD_LIBS        =
 
 # External Libraries (if any) : blas, lapack, fft, MPI
 
@@ -123,29 +123,29 @@ BLAS_LIBS_SWITCH = external
 # For IBM machines with essl (-D__ESSL): load essl BEFORE lapack !
 # remember that LAPACK_LIBS precedes BLAS_LIBS in loading order
 
-LAPACK_LIBS    = 
+LAPACK_LIBS    =
 LAPACK_LIBS_SWITCH = external
 
-SCALAPACK_LIBS = 
+SCALAPACK_LIBS =
 
 # nothing needed here if the the internal copy of FFTW is compiled
 # (needs -D__FFTW in DFLAGS)
 
-FFT_LIBS       = 
+FFT_LIBS       =
 
 # HDF5
-HDF5_LIB = 
+HDF5_LIB =
 FOX_LIB  = -L$(TOPDIR)/FoX/lib  -lFoX_dom -lFoX_sax -lFoX_wxml -lFoX_common\
-            -lFoX_utils -lFoX_fsys 
+            -lFoX_utils -lFoX_fsys
 
 # For parallel execution, the correct path to MPI libraries must
 # be specified in MPI_LIBS (except for IBM if you use mpxlf)
 
-MPI_LIBS       = 
+MPI_LIBS       =
 
 # IBM-specific: MASS libraries, if available and if -D__MASS is defined in FDFLAGS
 
-MASS_LIBS      = 
+MASS_LIBS      =
 
 # ar command and flags - for most architectures: AR = ar, ARFLAGS = ruv
 
