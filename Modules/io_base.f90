@@ -137,10 +137,10 @@ MODULE io_base
       !
       IF ( ionode_in_group ) THEN
          ALLOCATE( wtmp( MAX( npol*igwx, 1 ) ) )
-         ALLOCATE( rtmp( 2, MAX( npol*igwx, 1 ) ) )
+         ALLOCATE( rtmp( MAX( npol*igwx, 1 ), 2 ) )
       ELSE
          ALLOCATE( wtmp( 1 ) )
-         ALLOCATE( rtmp( 2, 1 ) )
+         ALLOCATE( rtmp( 1, 2 ) )
       ENDIF
       wtmp = 0.0_DP
       !
@@ -178,10 +178,13 @@ MODULE io_base
             CALL qeh5_write_dataset ( wtmp, evc_dset)
 #else
             DO ig = 1, npol*igwx
-              rtmp(1, ig) =  DBLE(wtmp(ig))
-              rtmp(2, ig) = AIMAG(wtmp(ig))
+              rtmp(ig, 1) =  DBLE(wtmp(ig))
             END DO
-            WRITE(iuni) rtmp(:, 1:npol*igwx)
+            DO ig = 1, npol*igwx
+              rtmp(ig, 2) = AIMAG(wtmp(ig))
+            END DO
+            WRITE(iuni) rtmp(1:npol*igwx, 1)
+            WRITE(iuni) rtmp(1:npol*igwx, 2)
 #endif
          END IF
          !
@@ -332,14 +335,14 @@ MODULE io_base
       !
       IF ( ionode_in_group ) THEN
          ALLOCATE( wtmp( npol*MAX( igwx_, igwx ) ) )
-         ALLOCATE( rtmp( 2, npol*MAX( igwx_, igwx ) ) )
+         ALLOCATE( rtmp( npol*MAX( igwx_, igwx ), 2 ) )
 #if defined (__HDF5)
          CALL qeh5_open_dataset( h5file, h5dset_wfc, ACTION = 'read', NAME = 'evc')
          CALL qeh5_set_space ( h5dset_wfc, wtmp(1), RANK = 1, DIMENSIONS = [npol*igwx_], MODE = 'm')
 #endif
       ELSE
          ALLOCATE( wtmp(1) )
-         ALLOCATE( rtmp(2, 1) )
+         ALLOCATE( rtmp(1, 2) )
       ENDIF
       nbnd = nbnd_
       DO j = 1, nbnd_
@@ -352,9 +355,10 @@ MODULE io_base
                CALL qeh5_set_file_hyperslab (h5dset_wfc, OFFSET = [0,j-1], COUNT = [2*npol*igwx_,1] )
                CALL qeh5_read_dataset (wtmp, h5dset_wfc )
 #else
-               READ (iuni) rtmp(:, 1:npol*igwx_)
+               READ (iuni) rtmp(1:npol*igwx_, 1)
+               READ (iuni) rtmp(1:npol*igwx_, 2)
                DO ig = 1, npol*igwx_
-                 wtmp(ig) = DCMPLX(rtmp(1, ig), rtmp(2, ig))
+                 wtmp(ig) = DCMPLX(rtmp(ig, 1), rtmp(ig, 2))
                END DO
 #endif
                IF ( igwx > igwx_ ) wtmp((npol*igwx_+1):npol*igwx) = 0.0_DP
